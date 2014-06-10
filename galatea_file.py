@@ -1,7 +1,7 @@
 #This file is part galatea_file blueprint for Flask.
 #The COPYRIGHT file at the top level of this repository contains 
 #the full copyright notices and license terms.
-from flask import Blueprint, Response, abort, current_app
+from flask import Blueprint, Response, abort, current_app, redirect
 from galatea.tryton import tryton
 from mimetypes import guess_type
 
@@ -25,6 +25,11 @@ def filename(filename):
     if not resource.split(',')[0] in RESOURCE:
         abort(404)
 
+    if attachment.type == 'link':
+        if not attachment.link:
+            abort(404)
+        return redirect(attachment.link)
+
     file_mime = guess_type(filename)[0]
- 
+
     return Response(attachment.data, mimetype=file_mime)
