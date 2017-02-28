@@ -1,5 +1,5 @@
 #This file is part galatea_file blueprint for Flask.
-#The COPYRIGHT file at the top level of this repository contains 
+#The COPYRIGHT file at the top level of this repository contains
 #the full copyright notices and license terms.
 from flask import Blueprint, Response, abort, current_app, redirect
 from galatea.tryton import tryton
@@ -9,8 +9,6 @@ galatea_file = Blueprint('galatea_file', __name__, template_folder='templates')
 
 Attachment = tryton.pool.get('ir.attachment')
 StaticFile = tryton.pool.get('galatea.static.file')
-
-RESOURCE = current_app.config.get('TRYTON_ATTACHMENT_RESOURCE')
 
 @galatea_file.route('/file/<path:file_uri>', endpoint="file")
 @tryton.transaction()
@@ -41,13 +39,11 @@ def filename(file_uri):
 
     attachments = Attachment.search([
         ('name', '=', filename),
+        ('allow_galatea', '=', True),
         ], limit=1)
     if not attachments:
         abort(404)
     attachment, = attachments
-    resource = str(attachment.resource)
-    if not resource.split(',')[0] in RESOURCE:
-        abort(404)
 
     if attachment.type == 'link':
         if not attachment.link:
